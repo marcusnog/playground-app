@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { db } from '../services/mockDb'
 import { PaymentIcon, resolvePaymentKind } from '../ui/icons'
@@ -14,6 +14,7 @@ export default function Pagamento() {
 	if (!lanc) return <div>Registro não encontrado</div>
 
 	function finalizar() {
+		if (!lanc) return
 		db.update((dbb) => {
 			const l = dbb.lancamentos.find((x) => x.id === lanc.id)
 			if (l) {

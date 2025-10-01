@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { PaymentIcon, resolvePaymentKind } from '../ui/icons'
-import { db, FormaPagamento, uid } from '../services/mockDb'
+import { db, uid } from '../services/mockDb'
 
 export default function FormasPagamento() {
 	const [_, force] = useState(0)

@@ -37,7 +37,6 @@ export default function DashboardLayout() {
 		navigate('/login')
 	}
 
-	const linkStyle: React.CSSProperties = { marginRight: 12 }
 
 	return (
 		<div>

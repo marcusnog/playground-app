@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { db, Parametros } from '../services/mockDb'
+import { db, type Parametros } from '../services/mockDb'
 
 export default function Parametros() {
 	const current = db.get().parametros

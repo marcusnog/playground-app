@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { db, Caixa, CaixaStatus } from '../services/mockDb'
+import { db, type Caixa } from '../services/mockDb'
 import { PaymentIcon, resolvePaymentKind } from '../ui/icons'
 
 export default function Caixa() {

@@ -35,7 +35,8 @@ export default function Lancamento() {
 			})
 		})
 		alert('Lançamento salvo. Gerando cupom...')
-		navigate(`/recibo/lancamento/${db.get().lancamentos.at(-1)?.id}`)
+		const lancamentos = db.get().lancamentos
+		navigate(`/recibo/lancamento/${lancamentos[lancamentos.length - 1]?.id}`)
 	}
 
 	return (
