@@ -1,11 +1,30 @@
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../auth/AuthContext'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 export default function DashboardLayout() {
 	const { logout } = useAuth()
 	const navigate = useNavigate()
 	const location = useLocation()
+	const [sidebarOpen, setSidebarOpen] = useState(false)
+	const [submenuOpen, setSubmenuOpen] = useState<string | null>(null)
+	
+	// Check if we're on desktop
+	const [isDesktop, setIsDesktop] = useState(false)
+	
+	useEffect(() => {
+		const checkScreenSize = () => {
+			setIsDesktop(window.innerWidth >= 1024)
+		}
+		
+		checkScreenSize()
+		window.addEventListener('resize', checkScreenSize)
+		
+		return () => window.removeEventListener('resize', checkScreenSize)
+	}, [])
+	
+	// Use isDesktop to control sidebar visibility
+	const shouldShowSidebar = isDesktop || sidebarOpen
 
 	function toggleTheme() {
 		const isLight = document.documentElement.dataset.theme === 'light'
@@ -19,7 +38,8 @@ export default function DashboardLayout() {
 	// Update page title based on current route
 	const path = location.pathname
 	let pageTitle = 'Dashboard'
-	if (path.startsWith('/acompanhamento')) pageTitle = 'Acompanhamento'
+	if (path.startsWith('/dashboard')) pageTitle = 'Dashboard'
+	else if (path.startsWith('/acompanhamento')) pageTitle = 'Acompanhamento'
 	else if (path.startsWith('/lancamento')) pageTitle = 'Lançamento'
 	else if (path.startsWith('/caixa')) pageTitle = 'Caixa'
 	else if (path.startsWith('/parametros')) pageTitle = 'Parâmetros'
@@ -37,20 +57,27 @@ export default function DashboardLayout() {
 		navigate('/login')
 	}
 
+	const toggleSidebar = () => {
+		setSidebarOpen(!sidebarOpen)
+	}
+
+	const closeSidebar = () => {
+		setSidebarOpen(false)
+	}
+
+	const toggleSubmenu = (menuName: string) => {
+		setSubmenuOpen(submenuOpen === menuName ? null : menuName)
+	}
 
 	return (
-		<div>
-			<header className="app-header">
+		<div className="app-layout">
+			{/* Mobile Header */}
+			<header className="app-header mobile-header">
+				<button className="menu-toggle" onClick={toggleSidebar}>
+					☰
+				</button>
 				<Link to="/acompanhamento" className="brand">Parque</Link>
-				<nav className="app-nav" style={{ flex: 1 }}>
-					<NavLink to="/acompanhamento">Acompanhamento</NavLink>
-					<NavLink to="/lancamento">Lançamento</NavLink>
-					<NavLink to="/caixa">Caixa</NavLink>
-					<NavLink to="/parametros">Parâmetros</NavLink>
-					<NavLink to="/formas-pagamento">Formas de Pagamento</NavLink>
-					<NavLink to="/brinquedos">Brinquedos</NavLink>
-				</nav>
-				<div className="row" style={{ alignItems: 'center', marginLeft: 'auto' }}>
+				<div className="header-actions">
 					<label className="switch">
 						<span className="icon sun">☀️</span>
 						<input type="checkbox" onChange={toggleTheme} defaultChecked={isLight} />
@@ -60,8 +87,74 @@ export default function DashboardLayout() {
 					<button className="btn" onClick={onLogout}>Sair</button>
 				</div>
 			</header>
-			<main className="page container">
-				<Outlet />
+
+			{/* Sidebar */}
+			<aside className={`sidebar ${shouldShowSidebar ? 'open' : ''}`}>
+				<div className="sidebar-header">
+					<Link to="/acompanhamento" className="brand" onClick={closeSidebar}>Parque</Link>
+					<button className="close-sidebar" onClick={closeSidebar}>×</button>
+				</div>
+				<nav className="sidebar-nav">
+					<NavLink to="/dashboard" onClick={closeSidebar}>
+						<span className="nav-icon">📈</span>
+						Dashboard
+					</NavLink>
+					<NavLink to="/acompanhamento" onClick={closeSidebar}>
+						<span className="nav-icon">📊</span>
+						Acompanhamento
+					</NavLink>
+					<NavLink to="/lancamento" onClick={closeSidebar}>
+						<span className="nav-icon">➕</span>
+						Lançamento
+					</NavLink>
+					<NavLink to="/caixa" onClick={closeSidebar}>
+						<span className="nav-icon">💰</span>
+						Caixa
+					</NavLink>
+					
+					{/* Parâmetros com submenu */}
+					<div className="nav-item">
+						<button 
+							className="nav-link nav-toggle" 
+							onClick={() => toggleSubmenu('parametros')}
+						>
+							<span className="nav-icon">⚙️</span>
+							Parâmetros
+							<span className={`nav-arrow ${submenuOpen === 'parametros' ? 'open' : ''}`}>▼</span>
+						</button>
+						{submenuOpen === 'parametros' && (
+							<div className="nav-submenu">
+								<NavLink to="/parametros" onClick={closeSidebar}>
+									<span className="nav-icon">⚙️</span>
+									Configurações
+								</NavLink>
+								<NavLink to="/formas-pagamento" onClick={closeSidebar}>
+									<span className="nav-icon">💳</span>
+									Formas de Pagamento
+								</NavLink>
+								<NavLink to="/brinquedos" onClick={closeSidebar}>
+									<span className="nav-icon">🎠</span>
+									Brinquedos
+								</NavLink>
+							</div>
+						)}
+					</div>
+				</nav>
+				<div className="sidebar-footer">
+					<div className="user-info">
+						<span>Usuário Logado</span>
+					</div>
+				</div>
+			</aside>
+
+			{/* Overlay for mobile */}
+			{sidebarOpen && <div className="sidebar-overlay" onClick={closeSidebar}></div>}
+
+			{/* Main Content */}
+			<main className="main-content">
+				<div className="page container">
+					<Outlet />
+				</div>
 			</main>
 		</div>
 	)

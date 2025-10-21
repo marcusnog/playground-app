@@ -8,6 +8,7 @@ import Brinquedos from './screens/Brinquedos'
 import Caixa from './screens/Caixa'
 import Lancamento from './screens/Lancamento'
 import Acompanhamento from './screens/Acompanhamento'
+import Dashboard from './screens/Dashboard'
 import Pagamento from './screens/Pagamento'
 import ReciboLancamento from './screens/recibos/ReciboLancamento'
 import ReciboPagamento from './screens/recibos/ReciboPagamento'
@@ -19,7 +20,7 @@ function ProtectedRoute({ children }: { children: React.ReactElement }) {
 }
 
 export const router = createBrowserRouter([
-	{ path: '/', element: <Navigate to="/acompanhamento" replace /> },
+	{ path: '/', element: <Navigate to="/dashboard" replace /> },
 	{ path: '/login', element: <Login /> },
 	{
 		path: '/',
@@ -29,6 +30,7 @@ export const router = createBrowserRouter([
 			</ProtectedRoute>
 		),
 		children: [
+			{ path: 'dashboard', element: <Dashboard /> },
 			{ path: 'parametros', element: <Parametros /> },
 			{ path: 'formas-pagamento', element: <FormasPagamento /> },
 			{ path: 'brinquedos', element: <Brinquedos /> },
